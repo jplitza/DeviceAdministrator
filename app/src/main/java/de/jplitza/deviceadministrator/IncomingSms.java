@@ -1,8 +1,6 @@
 package de.jplitza.deviceadministrator;
 
-import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,11 +23,19 @@ public class IncomingSms extends BroadcastReceiver {
     }
 
     private void activateGps(Context context) {
-        DevicePolicyManager mDPM = (DevicePolicyManager)context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        mDPM.setSecureSetting(getComponentName(context), Settings.Secure.LOCATION_MODE, Integer.toString(Settings.Secure.LOCATION_MODE_HIGH_ACCURACY));
-    }
-    public static ComponentName getComponentName(Context context) {
-        return new ComponentName(context.getApplicationContext(), DeviceAdmin.class);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (!prefs.getBoolean("allow_location_modechange", false))
+            return;
+
+        if (!DeviceAdmin.getDPM(context).isDeviceOwnerApp(context.getApplicationContext().getPackageName()))
+            return;
+
+        DeviceAdmin.getDPM(context).setSecureSetting(
+                DeviceAdmin.getComponentName(context),
+                Settings.Secure.LOCATION_MODE,
+                Integer.toString(Settings.Secure.LOCATION_MODE_HIGH_ACCURACY)
+        );
+        Log.d("SmsReceiver", "Forcefully enabled GPS");
     }
     private void getLocation(Context context, String number) throws SecurityException {
         activateGps(context);
@@ -78,11 +84,12 @@ public class IncomingSms extends BroadcastReceiver {
                             ).show();
                             break;
                         case LOCATE:
-                            getLocation(context, senderNum);
+                            if (prefs.getBoolean("allow_location", false))
+                                getLocation(context, senderNum);
                             break;
                         case WIPE:
-                            DevicePolicyManager mDPM = (DevicePolicyManager)context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-                            mDPM.wipeData(0);
+                            if (prefs.getBoolean("allow_wipe", false))
+                                DeviceAdmin.getDPM(context).wipeData(0);
                             break;
                     }
                 }

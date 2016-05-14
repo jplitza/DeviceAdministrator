@@ -1,19 +1,27 @@
 <resources>
     <string name="app_name">Device Administrator</string>
-     <!-- Strings related to Settings -->
-
-    <string name="pref_header_general">General</string>
-
-    <string name="pref_title_public_key">Public key</string>
-    <string name="pref_default_public_key">Base64-encoded pubkey</string>
-
-    <string name="pref_title_seqnum">Sequence number</string>
+    <string name="device_admin_description">Wipe and locate on receipt of signed SMS</string>
 
     <string name="pref_ringtone_silent">Silent</string>
 
-    <string name="pref_title_permissions_granted">Grant permissions</string>
-    <string name="pref_summary_permissions_granted">Grant the app the permissions it needs.</string>
+    <string name="pref_category_permissions">Permissions</string>
 
-    <string name="device_admin_label">Device Administrator</string>
-    <string name="device_admin_description">Wipe and locate on receipt of signed SMS</string>
+    <string name="pref_title_basic_permissions_granted">Basic permissions granted</string>
+    <string name="pref_summary_basic_permissions_granted">For its basic functionality, the app needs the permissions to receive and read incoming SMS.</string>
+
+    <string name="pref_title_allow_location">Allow location retrieval</string>
+    <string name="pref_summary_allow_location">Accept incoming commands to locate the device and respond with its current location.</string>
+
+    <string name="pref_title_allow_location_modechange">Enable GPS if needed</string>
+    <string name="pref_summary_allow_location_modechange">To enable GPS without user interaction, the app must be device admin <b>and</b> device owner. Please have a look at the readme how to achieve the latter.</string>
+
+    <string name="pref_title_allow_wipe">Allow device wipe</string>
+    <string name="pref_summary_allow_wipe">Accept incoming commands to wipe (factory reset) the device.</string>
+
+    <string name="pref_category_security">Security</string>
+
+    <string name="pref_title_public_key">Public key</string>
+    <string name="pref_summary_public_key">Base64 encoded Ed25519 public key. Generate this on your computer!</string>
+
+    <string name="pref_title_seqnum">Next expected sequence number</string>
 </resources>

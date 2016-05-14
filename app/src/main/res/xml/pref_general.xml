@@ -1,25 +1,49 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:context=".SettingsActivity">
 
-    <CheckBoxPreference
-        android:key="permissions_granted"
-        android:title="@string/pref_title_permissions_granted"
-        android:summary="@string/pref_summary_permissions_granted" />
+    <PreferenceCategory android:title="@string/pref_category_permissions">
+        <CheckBoxPreference
+            android:key="basic_permissions_granted"
+            android:title="@string/pref_title_basic_permissions_granted"
+            android:summary="@string/pref_summary_basic_permissions_granted"
+            />
+        <CheckBoxPreference
+            android:key="allow_location"
+            android:title="@string/pref_title_allow_location"
+            android:summary="@string/pref_summary_allow_location"
+            android:dependency="basic_permissions_granted" />
 
-    <EditTextPreference
-        android:key="public_key"
-        android:title="@string/pref_title_public_key"
-        android:defaultValue="@string/pref_default_public_key"
-        android:selectAllOnFocus="true"
-        android:inputType="text"
-        android:capitalize="none"
-        android:singleLine="true"
-        android:maxLines="1" />
+        <CheckBoxPreference
+            android:key="allow_location_modechange"
+            android:title="@string/pref_title_allow_location_modechange"
+            android:summary="@string/pref_summary_allow_location_modechange"
+            android:dependency="allow_location" />
 
-    <EditTextPreference
-        android:key="seqnum"
-        android:title="@string/pref_title_seqnum"
-        android:defaultValue="0"
-        android:selectAllOnFocus="true"
-        android:inputType="number" />
+        <CheckBoxPreference
+            android:key="allow_wipe"
+            android:title="@string/pref_title_allow_wipe"
+            android:summary="@string/pref_summary_allow_wipe"
+            android:dependency="basic_permissions_granted" />
+    </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/pref_category_security">
+        <EditTextPreference
+            android:key="public_key"
+            android:title="@string/pref_title_public_key"
+            android:defaultValue=""
+            android:summary="@string/pref_summary_public_key"
+            android:selectAllOnFocus="true"
+            android:inputType="text"
+            android:capitalize="none"
+            android:singleLine="true"
+            android:maxLines="1" />
+
+        <EditTextPreference
+            android:key="seqnum"
+            android:title="@string/pref_title_seqnum"
+            android:defaultValue="0"
+            android:selectAllOnFocus="true"
+            android:inputType="number" />
+    </PreferenceCategory>
 </PreferenceScreen>

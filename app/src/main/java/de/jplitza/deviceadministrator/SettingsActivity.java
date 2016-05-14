@@ -2,58 +2,31 @@ package de.jplitza.deviceadministrator;
 
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
+import android.app.admin.DevicePolicyManager;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
-import android.text.TextUtils;
-import android.view.MenuItem;
+import android.util.ArrayMap;
+import android.util.Log;
 
-import java.lang.reflect.Constructor;
-import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
-/**
- * A {@link PreferenceActivity} that presents a set of application settings. On
- * handset devices, settings are presented as a single list. On tablets,
- * settings are split by category, with category headers shown to the left of
- * the list of settings.
- * <p>
- * See <a href="http://developer.android.com/design/patterns/settings.html">
- * Android Design: Settings</a> for design guidelines and the <a
- * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
- * API Guide</a> for more information on developing a Settings UI.
- */
+@SuppressWarnings("deprecation")
 public class SettingsActivity extends AppCompatPreferenceActivity {
-    static String perms[] = {
-            Manifest.permission.RECEIVE_SMS,
-            Manifest.permission.READ_SMS,
-            Manifest.permission.SEND_SMS,
-            Manifest.permission.ACCESS_FINE_LOCATION
-    };
+    private Activity mSettingsActivity;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setupActionBar();
-    }
+    static private ArrayMap<String, String[]> perms = new ArrayMap<>(3);
 
     /**
      * Set up the {@link android.app.ActionBar}, if the API is available.
@@ -64,28 +37,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean onIsMultiPane() {
-        return isXLargeTablet(this);
-    }
-
-    /**
-     * Helper method to determine if the device has an extra-large screen. For
-     * example, 10" tablets are extra-large.
-     */
-    private static boolean isXLargeTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-        & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.pref_headers, target);
     }
 
     /**
@@ -108,28 +59,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         index >= 0
                                 ? listPreference.getEntries()[index]
                                 : null);
-
-            } else if (preference instanceof RingtonePreference) {
-                // For ringtone preferences, look up the correct display value
-                // using RingtoneManager.
-                if (TextUtils.isEmpty(stringValue)) {
-                    // Empty values correspond to 'silent' (no ringtone).
-                    preference.setSummary(R.string.pref_ringtone_silent);
-
-                } else {
-                    Ringtone ringtone = RingtoneManager.getRingtone(
-                            preference.getContext(), Uri.parse(stringValue));
-
-                    if (ringtone == null) {
-                        // Clear the summary if there was a lookup error.
-                        preference.setSummary(null);
-                    } else {
-                        // Set the summary to reflect the new ringtone display
-                        // name.
-                        String name = ringtone.getTitle(preference.getContext());
-                        preference.setSummary(name);
-                    }
-                }
 
             } else {
                 // For all other preferences, set the summary to the value's
@@ -166,77 +95,102 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * Make sure to deny any unknown fragments here.
      */
     protected boolean isValidFragment(String fragmentName) {
-        return PreferenceFragment.class.getName().equals(fragmentName)
-                || GeneralPreferenceFragment.class.getName().equals(fragmentName);
+        return PreferenceFragment.class.getName().equals(fragmentName);
     }
 
-    private static class BindPreferenceRequestPermissions implements Preference.OnPreferenceChangeListener {
-        Activity c;
-
-        private BindPreferenceRequestPermissions(Activity c) {
-            this.c = c;
-        }
+    private class BindPreferenceRequestPermissions implements Preference.OnPreferenceChangeListener {
         @Override
         public boolean onPreferenceChange(Preference preference, Object o) {
-            for (String perm : perms){
-                if (ContextCompat.checkSelfPermission(c, perm) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(c, perms, 1);
-                    break;
-                }
+            if (!(boolean)o)
+                return !preference.getKey().equals("basic_permissions_granted");
+
+            List<String> missingPerms = new LinkedList<>();
+            for (String perm : perms.get(preference.getKey())){
+                if ((perm.equals(Manifest.permission.BIND_DEVICE_ADMIN) && !DeviceAdmin.getDPM(mSettingsActivity).isAdminActive(DeviceAdmin.getComponentName(mSettingsActivity)))
+                || (!perm.equals(Manifest.permission.BIND_DEVICE_ADMIN) && ContextCompat.checkSelfPermission(mSettingsActivity, perm) != PackageManager.PERMISSION_GRANTED))
+                    missingPerms.add(perm);
             }
+            if (missingPerms.isEmpty())
+                return true;
+
+            ActivityCompat.requestPermissions(
+                    mSettingsActivity,
+                    missingPerms.toArray(new String[missingPerms.size()]),
+                    perms.indexOfKey(preference.getKey())
+            );
             return false;
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        boolean have_all = false;
-        for (String perm : perms) {
+    public void onRequestPermissionsResult(
+            int requestCode,
+            @NonNull String[] permissions,
+            @NonNull int[] grantResults
+    ) {
+        boolean granted = true;
+        boolean need_device_admin = false;
+        for (String perm : perms.valueAt(requestCode)) {
             for (int i = 0; i < permissions.length; i++) {
                 if (permissions[i].equals(perm)) {
-                    have_all = grantResults[i] == PackageManager.PERMISSION_GRANTED;
+                    if (perm.equals(Manifest.permission.BIND_DEVICE_ADMIN)) {
+                        need_device_admin = true;
+                    } else {
+                        granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
+                    }
                     break;
                 }
             }
-            if (!have_all)
+            if (!granted)
                 break;
         }
-        if (have_all) {
-            SharedPreferences.Editor e = PreferenceManager.getDefaultSharedPreferences(this).edit();
-            e.putBoolean("permissions_granted", true);
-            e.apply();
+        if (granted && need_device_admin) {
+            Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, DeviceAdmin.getComponentName(this));
+            intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, findPreference(perms.keyAt(requestCode)).getSummary());
+            startActivityForResult(intent, requestCode);
+        }
+        else {
+            Log.d("RequestPermissionsResul", "Setting checkbox " + perms.keyAt(requestCode) + " to " + granted);
+            ((CheckBoxPreference)findPreference(perms.keyAt(requestCode))).setChecked(granted);
         }
     }
 
-    /**
-     * This fragment shows general preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class GeneralPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_general);
-            setHasOptionsMenu(true);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        ((CheckBoxPreference)findPreference(perms.keyAt(requestCode))).setChecked(resultCode == Activity.RESULT_OK);
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("public_key"));
-            bindPreferenceSummaryToValue(findPreference("seqnum"));
-            findPreference("permissions_granted").setOnPreferenceChangeListener(new BindPreferenceRequestPermissions(getActivity()));
-        }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mSettingsActivity = this;
+        addPreferencesFromResource(R.xml.pref_general);
+        setupActionBar();
 
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            int id = item.getItemId();
-            if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
-        }
+        // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+        // to their values. When their values change, their summaries are
+        // updated to reflect the new value, per the Android Design
+        // guidelines.
+        bindPreferenceSummaryToValue(findPreference("seqnum"));
+
+        perms.put("basic_permissions_granted", new String[]{
+                Manifest.permission.RECEIVE_SMS,
+                Manifest.permission.READ_SMS,
+        });
+        perms.put("allow_location", new String[]{
+                Manifest.permission.SEND_SMS,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+        });
+        perms.put("allow_location_modechange", new String[]{
+                Manifest.permission.BIND_DEVICE_ADMIN,
+        });
+        perms.put("allow_wipe", new String[]{
+                Manifest.permission.BIND_DEVICE_ADMIN,
+        });
+        for (String key : perms.keySet())
+            findPreference(key)
+                    .setOnPreferenceChangeListener(new BindPreferenceRequestPermissions());
     }
 }
