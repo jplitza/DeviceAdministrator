@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Geräteadministrator</string>
+    <string name="device_admin_description">Lokalisiert oder löscht das Gerät bei Empfang einer entsprechend signierten SMS.</string>
+    <string name="pref_category_permissions">Berechtigungen</string>
+    <string name="pref_category_security">Sicherheit</string>
+    <string name="pref_ringtone_silent">Stumm</string>
+    <string name="pref_summary_allow_location">Erlaube Befehle zum Auffinden des Geräts und antworte mit aktueller Position.</string>
+    <string name="pref_summary_allow_location_modechange">Um GPS ohne Benutzerinteraktion zu aktivieren muss die App Geräteinhaber sein. Bitte schaue in die Readme wie das funktioniert.</string>
+    <string name="pref_summary_allow_wipe">Erlaube Befehle zum Zurücksetzen des Geräts.</string>
+    <string name="pref_summary_basic_permissions_granted">Um überhaupt zu funktionieren benötigt die App die Berechtigung, ankommende SMS zu empfangen und zu lesen.</string>
+    <string name="pref_summary_public_key">Base64-kodierter öffentlicher Ed25519-Schlüssel. Den musst du auf deinem Computer erzeugen!</string>
+    <string name="pref_title_allow_location">Erlaube Positionsbestimmung</string>
+    <string name="pref_title_allow_location_modechange">Aktiviere GPS falls nötig</string>
+    <string name="pref_title_allow_wipe">Erlaube Zurücksetzen des Geräts</string>
+    <string name="pref_title_basic_permissions_granted">Grundberechtigungen genehmigt</string>
+    <string name="pref_title_public_key">Öffentlicher Schlüssel</string>
+    <string name="pref_title_seqnum">Nächste erwartete Sequenznummer</string>
+</resources>
