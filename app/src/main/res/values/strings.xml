@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Device Administrator</string>
+     <!-- Strings related to Settings -->
+
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_public_key">Public key</string>
+    <string name="pref_default_public_key">Base64-encoded pubkey</string>
+
+    <string name="pref_title_seqnum">Sequence number</string>
+
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_permissions_granted">Grant permissions</string>
+    <string name="pref_summary_permissions_granted">Grant the app the permissions it needs.</string>
+
+    <string name="device_admin_label">Device Administrator</string>
+    <string name="device_admin_description">Wipe and locate on receipt of signed SMS</string>
+</resources>

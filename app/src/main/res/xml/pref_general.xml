@@ -1,0 +1,25 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:key="permissions_granted"
+        android:title="@string/pref_title_permissions_granted"
+        android:summary="@string/pref_summary_permissions_granted" />
+
+    <EditTextPreference
+        android:key="public_key"
+        android:title="@string/pref_title_public_key"
+        android:defaultValue="@string/pref_default_public_key"
+        android:selectAllOnFocus="true"
+        android:inputType="text"
+        android:capitalize="none"
+        android:singleLine="true"
+        android:maxLines="1" />
+
+    <EditTextPreference
+        android:key="seqnum"
+        android:title="@string/pref_title_seqnum"
+        android:defaultValue="0"
+        android:selectAllOnFocus="true"
+        android:inputType="number" />
+
+</PreferenceScreen>
