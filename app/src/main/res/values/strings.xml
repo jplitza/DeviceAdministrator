@@ -24,4 +24,7 @@
     <string name="pref_summary_public_key">Base64 encoded Ed25519 public key. Generate this on your computer!</string>
 
     <string name="pref_title_seqnum">Next expected sequence number</string>
+
+    <string name="scan_qr_code">Scan public key</string>
+    <string name="invalid_key_error">The key you entered/scanned isn\'t a valid Ed25519 public key.</string>
 </resources>

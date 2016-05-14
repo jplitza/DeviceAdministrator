@@ -16,4 +16,6 @@
     <string name="pref_title_basic_permissions_granted">Grundberechtigungen genehmigt</string>
     <string name="pref_title_public_key">Öffentlicher Schlüssel</string>
     <string name="pref_title_seqnum">Nächste erwartete Sequenznummer</string>
+    <string name="scan_qr_code">Öffentlichen Schlüssel scannen</string>
+    <string name="invalid_key_error">Der eingegebene/gescannte Schlüssel ist kein öffentlicher Ed25519-Schlüssel.</string>
 </resources>

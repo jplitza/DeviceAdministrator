@@ -26,4 +26,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.android.support:support-v4:23.4.0'
     compile 'net.i2p.crypto:eddsa:0.1.0'
+    compile 'com.google.zxing:android-integration:3.2.1'
 }
