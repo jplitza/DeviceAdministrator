@@ -27,6 +27,9 @@ public class IncomingSms extends BroadcastReceiver {
         if (!prefs.getBoolean("allow_location_modechange", false))
             return;
 
+        if (!DeviceAdmin.getDPM(context).isAdminActive(DeviceAdmin.getComponentName(context)))
+            return;
+
         if (!DeviceAdmin.getDPM(context).isDeviceOwnerApp(context.getApplicationContext().getPackageName()))
             return;
 
@@ -44,6 +47,10 @@ public class IncomingSms extends BroadcastReceiver {
     }
 
     public void onReceive(Context context, Intent intent) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = prefs.getString("public_key", "");
+        if (key.isEmpty())
+            return;
 
         SmsMessage msgs[] = android.provider.Telephony.Sms.Intents.getMessagesFromIntent(intent);
 
@@ -59,20 +66,18 @@ public class IncomingSms extends BroadcastReceiver {
                 byte data[] = Base64.decode(message, Base64.DEFAULT);
 
                 EdDSAEngine sig = new EdDSAEngine();
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                sig.initVerify(new EdDSAPublicKey(new X509EncodedKeySpec(Base64.decode(
-                        prefs.getString("public_key", ""),
-                        Base64.DEFAULT
-                )
-                )));
+                sig.initVerify(new EdDSAPublicKey(new X509EncodedKeySpec(Base64.decode(key, Base64.DEFAULT))));
                 if (!sig.verifyOneShot(data, 0, 2, data, 2, data.length - 2))
                     continue;
                 Log.d("SmsReceiver", "Signature valid, command: " + data[1] + ", seqnum: " + data[0]);
                 byte seqnum = data[0];
                 if (seqnum < Integer.valueOf(prefs.getString("seqnum", "0"))) {
-                    Log.d("SmsReceiver", "Sequence number " + seqnum + " is lower than last sequence number " + prefs.getString("seqnum", "0"));
+                    Log.d("SmsReceiver", "Sequence number " + seqnum + " is lower than next expected sequence number " + prefs.getString("seqnum", "0"));
                     continue;
                 }
+                SharedPreferences.Editor e = prefs.edit();
+                e.putString("seqnum", Integer.toString(seqnum + 1));
+                e.apply();
                 try {
                     Command command = Command.values()[data[1]];
                     switch (command) {
@@ -93,13 +98,9 @@ public class IncomingSms extends BroadcastReceiver {
                             break;
                     }
                 }
-                catch(ArrayIndexOutOfBoundsException e) {
+                catch(ArrayIndexOutOfBoundsException exc) {
                     Log.w("SmsReceiver", "Valid message but invalid command received: " + data[1]);
-                    continue;
                 }
-                SharedPreferences.Editor e = prefs.edit();
-                e.putString("seqnum", Integer.toString(seqnum + 1));
-                e.apply();
             } catch (Exception e) {
                 Log.e("SmsReceiver", "Exception", e);
 
