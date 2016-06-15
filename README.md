@@ -36,3 +36,33 @@ If that doesn't work but the device is rooted, manually editing the file `/data/
 <device-owner package="de.jplitza.deviceadministrator" />
 ```
 ([Source](http://stackoverflow.com/a/27909315))
+
+Generating keypair/commands
+---------------------------
+
+This currently has to be done on a PC and is very cumbersome. Plans are to include this in the app in the future.
+
+In a terminal:
+```sh
+# change to src/ directory
+cd src/
+# compile the host component of the app (only has to be done once)
+javac -extdir . host.java
+# generate keypair
+CLASSPATH=eddsa-0.1.0.jar:. java host
+```
+This will output a private and a public key in Base64 format.
+**The private key isn't stored anywhere**, you need to save it somewhere yourself!
+Afterwards, you can copy the public key into the app on your phone, for example by generating a QR code with the public key in it.
+
+To generate a command, invoke the program like so:
+```sh
+CLASSPATH=eddsa-0.1.0.jar:. java host $PRIVKEY $SEQNUM $COMMAND
+```
+where `$PRIVKEY` is the private key that you copied somewhere save (right?), `$SEQNUM` is a sequence number higher than the last one your phone received, and `$COMMAND` is one of the following:
+
+ Code | Command
+------|---------
+ 0    | Test, will only spawn a message on the phone when received.
+ 1    | Locate
+ 2    | Wipe
