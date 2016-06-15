@@ -4,7 +4,6 @@
     <string name="device_admin_description">Lokalisiert oder löscht das Gerät bei Empfang einer entsprechend signierten SMS.</string>
     <string name="pref_category_permissions">Berechtigungen</string>
     <string name="pref_category_security">Sicherheit</string>
-    <string name="pref_ringtone_silent">Stumm</string>
     <string name="pref_summary_allow_location">Erlaube Befehle zum Auffinden des Geräts und antworte mit aktueller Position.</string>
     <string name="pref_summary_allow_location_modechange">Um GPS ohne Benutzerinteraktion zu aktivieren muss die App Geräteinhaber sein. Bitte schaue in die Readme wie das funktioniert.</string>
     <string name="pref_summary_allow_wipe">Erlaube Befehle zum Zurücksetzen des Geräts.</string>
@@ -18,4 +17,5 @@
     <string name="pref_title_seqnum">Nächste erwartete Sequenznummer</string>
     <string name="scan_qr_code">Öffentlichen Schlüssel scannen</string>
     <string name="invalid_key_error">Der eingegebene/gescannte Schlüssel ist kein öffentlicher Ed25519-Schlüssel.</string>
+    <string name="msg_test_successful">DevAdmin: Gültigen Test mit Sequenznummer %1$d erhalten.</string>
 </resources>

@@ -84,7 +84,10 @@ public class IncomingSms extends BroadcastReceiver {
                         case TEST:
                             Toast.makeText(
                                     context,
-                                    "DevAdmin: Valid test with seqnum " + seqnum + " received.",
+                                    String.format(
+                                            context.getResources().getString(R.string.msg_test_successful),
+                                            seqnum
+                                    ),
                                     Toast.LENGTH_LONG
                             ).show();
                             break;

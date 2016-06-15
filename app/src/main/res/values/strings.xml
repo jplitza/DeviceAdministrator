@@ -2,7 +2,7 @@
     <string name="app_name">Device Administrator</string>
     <string name="device_admin_description">Wipe and locate on receipt of signed SMS</string>
 
-    <string name="pref_ringtone_silent">Silent</string>
+    <string name="msg_test_successful">DevAdmin: Valid test with seqnum %1$d received.</string>
 
     <string name="pref_category_permissions">Permissions</string>
 
